@@ -7,7 +7,7 @@ const {
 const ONE_MEGABYTE = 1024 * 1024;
 const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
-let containerName = process.env.BLOB_CONTAINER_NAME;
+let containerName = 'thumbnails';
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 let blobName = 'default-low.png';
 
