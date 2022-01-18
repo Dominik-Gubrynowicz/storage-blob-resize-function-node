@@ -15,8 +15,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
     Jimp.read(inputBlob).then((thumbnail) => {
 
-        console.log(JSON.stringify(eventGridEvent));
-        console.log(eventGridEvent[0].subject);
+        console.log(eventGridEvent);
 
         thumbnail.resize(widthInPixels, Jimp.AUTO);
 
