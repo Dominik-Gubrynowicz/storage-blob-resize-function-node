@@ -14,6 +14,7 @@ const blobName = process.env.OUT_BLOB_NAME;
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
     context.log('test');
+    context.log(eventGridEvent.subject);
     context.log(eventGridEvent);
     Jimp.read(inputBlob).then((thumbnail) => {
         
@@ -24,7 +25,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             const readStream = stream.PassThrough();
             readStream.end(buffer);
 
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName);
+            const blobClient = new BlockBlobClient(connectionString, containerName, eventGridEvent[0].subject);
             
             try {
                 await blobClient.uploadStream(readStream,
