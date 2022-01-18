@@ -9,6 +9,7 @@ const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
 const containerName = process.env.BLOB_CONTAINER_NAME;
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+let blobName = 'dupa1-low.png';
 
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
@@ -19,6 +20,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     context.log(outBlobName);
 
     const final = outBlobName.replace('.png', '-low.png');
+    blobName = final;
     context.log(final);
 
     Jimp.read(inputBlob).then((thumbnail) => {
@@ -32,7 +34,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             
             context.log('aaaa');
             context.log(final);
-            const blobClient = new BlockBlobClient(connectionString, containerName, 'dupa-low.png');
+            const blobClient = new BlockBlobClient(connectionString, containerName, blobName);
             
             try {
                 await blobClient.uploadStream(readStream,
