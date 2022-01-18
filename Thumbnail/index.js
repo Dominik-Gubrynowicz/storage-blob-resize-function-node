@@ -23,6 +23,12 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     blobName = final;
     context.log(final);
 
+    let containerPathName = splitted;
+    containerPathName.pop();
+    containerPathName.splice(0, 3);
+    containerPathName.splice(1,2);
+    context.log(containerPathName);
+
     Jimp.read(inputBlob).then((thumbnail) => {
         
         thumbnail.resize(widthInPixels, Jimp.AUTO);
