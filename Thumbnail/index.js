@@ -13,10 +13,10 @@ const blobName = process.env.OUT_BLOB_NAME;
 
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
+    context.log('test');
+    context.log(eventGridEvent);
     Jimp.read(inputBlob).then((thumbnail) => {
-
-        context.log(eventGridEvent);
-
+        
         thumbnail.resize(widthInPixels, Jimp.AUTO);
 
         thumbnail.getBuffer(Jimp.MIME_PNG, async (err, buffer) => {
