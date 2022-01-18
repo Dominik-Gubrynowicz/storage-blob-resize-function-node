@@ -9,13 +9,23 @@ const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
 const containerName = process.env.BLOB_CONTAINER_NAME;
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const blobName = process.env.OUT_BLOB_NAME;
 
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
+
+    const sub = eventGridEvent.subject;
+    const splitted = sub.split('/');
+    const outBlobName = splitted[splitted.length - 1];
+    context.log(outBlobName);
+
+    const final = outBlobName.replace('.png', '-low.png');
+    context.log(final);
+
+
     context.log('test');
     context.log(eventGridEvent.subject);
-    context.log(eventGridEvent);
+    
+
     Jimp.read(inputBlob).then((thumbnail) => {
         
         thumbnail.resize(widthInPixels, Jimp.AUTO);
@@ -24,6 +34,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
+
 
             const blobClient = new BlockBlobClient(connectionString, containerName, eventGridEvent[0].subject);
             
