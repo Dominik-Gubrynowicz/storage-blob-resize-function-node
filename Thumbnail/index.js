@@ -26,7 +26,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     let containerPathName = splitted;
     containerPathName.pop();
     context.log(containerPathName);
-    containerPathName.splice(0, 3);
+    containerPathName.splice(0, 4);
     context.log(containerPathName);
     containerPathName.splice(1,1);
     context.log(containerPathName);
