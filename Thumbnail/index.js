@@ -12,8 +12,11 @@ const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 const blobName = process.env.OUT_BLOB_NAME;
 
 module.exports = async function (context, eventGridEvent, inputBlob){
-    const widthInPixels = 100;
+    const widthInPixels = 1200;
     Jimp.read(inputBlob).then((thumbnail) => {
+
+        console.log(JSON.stringify(eventGridEvent));
+        console.log(eventGridEvent[0].subject);
 
         thumbnail.resize(widthInPixels, Jimp.AUTO);
 
