@@ -21,11 +21,6 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const final = outBlobName.replace('.png', '-low.png');
     context.log(final);
 
-
-    context.log('test');
-    context.log(eventGridEvent.subject);
-    
-
     Jimp.read(inputBlob).then((thumbnail) => {
         
         thumbnail.resize(widthInPixels, Jimp.AUTO);
@@ -34,7 +29,8 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-
+            
+            context.log('aaaa');
             context.log(final);
             const blobClient = new BlockBlobClient(connectionString, containerName, 'dupa-low.png');
             
