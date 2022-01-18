@@ -36,7 +36,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             readStream.end(buffer);
 
 
-            const blobClient = new BlockBlobClient(connectionString, containerName, 'dupa.png');
+            const blobClient = new BlockBlobClient(connectionString, containerName, 'dupa-low.png');
             
             try {
                 await blobClient.uploadStream(readStream,
