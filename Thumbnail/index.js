@@ -35,7 +35,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             const readStream = stream.PassThrough();
             readStream.end(buffer);
 
-
+            context.log(final);
             const blobClient = new BlockBlobClient(connectionString, containerName, 'dupa-low.png');
             
             try {
