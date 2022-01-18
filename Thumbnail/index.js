@@ -7,9 +7,9 @@ const {
 const ONE_MEGABYTE = 1024 * 1024;
 const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
-const containerName = process.env.BLOB_CONTAINER_NAME;
+let containerName = process.env.BLOB_CONTAINER_NAME;
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-let blobName = 'dupa1-low.png';
+let blobName = 'default-low.png';
 
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
@@ -17,19 +17,17 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const sub = eventGridEvent.subject;
     const splitted = sub.split('/');
     const outBlobName = splitted[splitted.length - 1];
-    context.log(outBlobName);
 
     const final = outBlobName.replace('.png', '-low.png');
     blobName = final;
-    context.log(final);
 
     let containerPathName = splitted;
     containerPathName.pop();
-    context.log(containerPathName);
     containerPathName.splice(0, 4);
-    context.log(containerPathName);
     containerPathName.splice(1,1);
-    context.log(containerPathName);
+
+    containerName = containerPathName.join("/")
+
 
     Jimp.read(inputBlob).then((thumbnail) => {
         
