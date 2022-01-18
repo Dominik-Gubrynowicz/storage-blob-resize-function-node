@@ -36,7 +36,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             readStream.end(buffer);
 
 
-            const blobClient = new BlockBlobClient(connectionString, containerName, eventGridEvent[0].subject);
+            const blobClient = new BlockBlobClient(connectionString, containerName, final);
             
             try {
                 await blobClient.uploadStream(readStream,
