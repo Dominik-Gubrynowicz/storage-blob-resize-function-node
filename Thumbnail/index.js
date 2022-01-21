@@ -1,16 +1,16 @@
 const Jimp = require('jimp');
 const stream = require('stream');
 const {
-    BlobServiceClient
+    BlockBlobClient,
 } = require("@azure/storage-blob");
 
 const ONE_MEGABYTE = 1024 * 1024;
-const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
+const uploadOptions = { bufferSize: 5 * ONE_MEGABYTE, maxBuffers: 1000 };
 
 let containerName = 'thumbnails';
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 let blobName = 'default-low.png';
-let res = 'error';
+
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
 
@@ -44,22 +44,16 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-            
-            /*const blobClient = new BlockBlobClient(connectionString, containerName, blobName);*/
-            const blobClient = new BlobServiceClient(connectionString);
+            const blobClient = new BlockBlobClient(connectionString, containerName, blockBlobClient);
 
             try {
-                const containerClient = blobClient.getContainerClient(containerName);
-                const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-                res = await blockBlobClient.upload(readStream, readStream.length);
-                // await blobClient.uploadStream(readStream,
-                //     uploadOptions.bufferSize,
-                //     uploadOptions.maxBuffers,
-                //     { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
+                await blobClient.uploadOptions()
+                await blobClient.uploadStream(readStream,
+                    uploadOptions.bufferSize,
+                    uploadOptions.maxBuffers,
+                    { blobHTTPHeaders: { blobContentType: "image/png" } }).then((res) => context.log(res));
             } catch (err) {
                 context.log(err.message);
-            } finally {
-                context.log(res)
             }
         });
     });
