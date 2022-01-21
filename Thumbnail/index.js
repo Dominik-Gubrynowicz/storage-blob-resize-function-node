@@ -1,7 +1,7 @@
 const Jimp = require('jimp');
 const stream = require('stream');
 const {
-    BlockBlobClient
+    BlobServiceClient
 } = require("@azure/storage-blob");
 
 const ONE_MEGABYTE = 1024 * 1024;
@@ -47,13 +47,17 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             
             context.log('aaaa');
             context.log(final);
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName);
-            
+            /*const blobClient = new BlockBlobClient(connectionString, containerName, blobName);*/
+            const blobClient = new BlobServiceClient(connectionString);
+
             try {
-                await blobClient.uploadStream(readStream,
-                    uploadOptions.bufferSize,
-                    uploadOptions.maxBuffers,
-                    { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
+                const containerClient = blobClient.getContainerClient(containerName);
+                const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+                await blockBlobClient.upload(readStream, readStream.length);
+                // await blobClient.uploadStream(readStream,
+                //     uploadOptions.bufferSize,
+                //     uploadOptions.maxBuffers,
+                //     { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
             } catch (err) {
                 context.log(err.message);
             }
