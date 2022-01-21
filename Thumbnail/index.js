@@ -44,9 +44,9 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-            //const storageRetryOptions = new StorageRetryOptions(maxTries = 20);
-            //const storagePipelineOptions = new StoragePipelineOptions(retryOptions = storageRetryOptions)
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName /*, storagePipelineOptions*/);
+            const storageRetryOptions = new StorageRetryOptions(maxTries = 20);
+            const storagePipelineOptions = new StoragePipelineOptions(retryOptions = storageRetryOptions);
+            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, storagePipelineOptions);
 
             try {
                 await blobClient.uploadStream(readStream,
