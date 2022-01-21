@@ -17,9 +17,11 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const sub = eventGridEvent.subject;
     const splitted = sub.split('/');
     const outBlobName = splitted[splitted.length - 1];
+    context.log('In file: ', outBlobName);
 
     const final = outBlobName.replace('.png', '-low.png');
     blobName = final;
+    context.log('Out file: ', final);
 
     let containerPathName = splitted;
     containerPathName.pop();
@@ -28,6 +30,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
     containerName = containerPathName.join("/")
 
+    context.log(containerName);
 
     Jimp.read(inputBlob).then((thumbnail) => {
         
