@@ -53,7 +53,8 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             try {
                 const containerClient = blobClient.getContainerClient(containerName);
                 const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-                await blockBlobClient.upload(readStream, readStream.length);
+                const res = await blockBlobClient.upload(readStream, readStream.length);
+                context.log(res)
                 // await blobClient.uploadStream(readStream,
                 //     uploadOptions.bufferSize,
                 //     uploadOptions.maxBuffers,
