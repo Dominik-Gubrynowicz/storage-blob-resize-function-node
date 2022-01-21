@@ -2,6 +2,8 @@ const Jimp = require('jimp');
 const stream = require('stream');
 const {
     BlockBlobClient,
+    StoragePipelineOptions,
+    StorageRetryOptions
 } = require("@azure/storage-blob");
 
 const ONE_MEGABYTE = 1024 * 1024;
@@ -12,6 +14,7 @@ const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 let blobName = 'default-low.png';
 
 module.exports = async function (context, eventGridEvent, inputBlob){
+
     const widthInPixels = 1200;
 
     const sub = eventGridEvent.subject;
@@ -44,7 +47,9 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName);
+            const storageRetryOptions = new StorageRetryOptions(maxTries = 3);
+            const storagePipelineOptions = new StoragePipelineOptions(retryOptions = storageRetryOptions)
+            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, storagePipelineOptions);
 
             try {
                 await blobClient.uploadStream(readStream,
@@ -53,6 +58,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
                     { blobHTTPHeaders: { blobContentType: "image/png" } }).then((res) => context.log(res));
             } catch (err) {
                 context.log(err.message);
+                throw new Error(err)
             }
         });
     });
