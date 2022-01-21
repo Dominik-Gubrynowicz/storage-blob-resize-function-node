@@ -1,9 +1,7 @@
 const Jimp = require('jimp');
 const stream = require('stream');
 const {
-    BlockBlobClient,
-    // StoragePipelineOptions,
-    // StorageRetryOptions
+    BlockBlobClient
 } = require("@azure/storage-blob");
 
 const ONE_MEGABYTE = 1024 * 1024;
@@ -44,9 +42,14 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-            const storageRetryOptions = new StorageRetryOptions(maxTries = 20);
-            const storagePipelineOptions = new StoragePipelineOptions(retryOptions = storageRetryOptions);
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, storagePipelineOptions);
+            
+            const pipelineOptions = {
+                retryOptions: {
+                  maxTries: 20
+                }
+            };
+
+            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, pipelineOptions);
 
             try {
                 await blobClient.uploadStream(readStream,
