@@ -10,7 +10,7 @@ const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 let containerName = 'thumbnails';
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 let blobName = 'default-low.png';
-
+let res = 'error';
 module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
 
@@ -45,22 +45,21 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             const readStream = stream.PassThrough();
             readStream.end(buffer);
             
-            context.log('aaaa');
-            context.log(final);
             /*const blobClient = new BlockBlobClient(connectionString, containerName, blobName);*/
             const blobClient = new BlobServiceClient(connectionString);
 
             try {
                 const containerClient = blobClient.getContainerClient(containerName);
                 const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-                const res = await blockBlobClient.upload(readStream, readStream.length);
-                context.log(res)
+                res = await blockBlobClient.upload(readStream, readStream.length);
                 // await blobClient.uploadStream(readStream,
                 //     uploadOptions.bufferSize,
                 //     uploadOptions.maxBuffers,
                 //     { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
             } catch (err) {
                 context.log(err.message);
+            } finally {
+                context.log(res)
             }
         });
     });
