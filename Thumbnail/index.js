@@ -15,6 +15,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
 
     const sub = eventGridEvent.subject;
+    context.log(sub);
     const splitted = sub.split('/');
     const outBlobName = splitted[splitted.length - 1];
     context.log('In file: ', outBlobName);
