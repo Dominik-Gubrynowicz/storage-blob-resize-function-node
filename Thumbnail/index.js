@@ -2,8 +2,8 @@ const Jimp = require('jimp');
 const stream = require('stream');
 const {
     BlockBlobClient,
-    StoragePipelineOptions,
-    StorageRetryOptions
+    // StoragePipelineOptions,
+    // StorageRetryOptions
 } = require("@azure/storage-blob");
 
 const ONE_MEGABYTE = 1024 * 1024;
@@ -18,11 +18,8 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
 
     const sub = eventGridEvent.subject;
-    context.log(eventGridEvent);
-    context.log(sub);
     const splitted = sub.split('/');
     const outBlobName = splitted[splitted.length - 1];
-    context.log('In file: ', outBlobName);
 
     const final = outBlobName.replace('.png', '-low.png');
     blobName = final;
@@ -47,9 +44,9 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-            const storageRetryOptions = new StorageRetryOptions(maxTries = 3);
-            const storagePipelineOptions = new StoragePipelineOptions(retryOptions = storageRetryOptions)
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, storagePipelineOptions);
+            //const storageRetryOptions = new StorageRetryOptions(maxTries = 20);
+            //const storagePipelineOptions = new StoragePipelineOptions(retryOptions = storageRetryOptions)
+            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, /*storagePipelineOptions*/);
 
             try {
                 await blobClient.uploadStream(readStream,
