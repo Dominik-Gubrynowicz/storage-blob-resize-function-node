@@ -15,6 +15,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const widthInPixels = 1200;
 
     const sub = eventGridEvent.subject;
+    context.log(eventGridEvent);
     context.log(sub);
     const splitted = sub.split('/');
     const outBlobName = splitted[splitted.length - 1];
@@ -38,6 +39,8 @@ module.exports = async function (context, eventGridEvent, inputBlob){
         thumbnail.resize(widthInPixels, Jimp.AUTO);
 
         thumbnail.getBuffer(Jimp.MIME_PNG, async (err, buffer) => {
+            
+            if (err) throw err;
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
