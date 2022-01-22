@@ -1,15 +1,21 @@
 const Jimp = require('jimp');
 const stream = require('stream');
 const {
-    BlockBlobClient
+    BlobServiceClient,
 } = require("@azure/storage-blob");
+const { DefaultAzureCredential } = require("@azure/identity");
 
-const ONE_MEGABYTE = 1024 * 1024;
-const uploadOptions = { bufferSize: 5 * ONE_MEGABYTE, maxBuffers: 10000 };
-
-let containerName = 'thumbnails';
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-let blobName = 'default-low.png';
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME
+
+let blobName = '';
+let containerName = '';
+
+const defaultAzureCredential = new DefaultAzureCredential();
+const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    defaultAzureCredential
+);
 
 module.exports = async function (context, eventGridEvent, inputBlob){
 
@@ -42,20 +48,12 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
-            
-            const pipelineOptions = {
-                retryOptions: {
-                  maxTries: 20
-                }
-            };
-
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName, pipelineOptions);
 
             try {
-                await blobClient.uploadStream(readStream,
-                    uploadOptions.bufferSize,
-                    uploadOptions.maxBuffers,
-                    { blobHTTPHeaders: { blobContentType: "image/png" } }).then((res) => context.log(res));
+                const containerClient = blobServiceClient.getContainerClient(containerName);
+                const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+                const uploadBlobResponse = await blockBlobClient.upload(readStream, readStream.length);
+                context.log(uploadBlobResponse);
             } catch (err) {
                 context.log(err.message);
                 throw new Error(err)
