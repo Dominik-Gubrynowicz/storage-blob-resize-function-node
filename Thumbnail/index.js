@@ -38,7 +38,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
     context.log(containerName);
 
-    containerClient = blobServiceClient.getContainerClient('images1');
+    containerClient = blobServiceClient.getContainerClient(containerName);
     blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     Jimp.read(inputBlob).then((thumbnail) => {
