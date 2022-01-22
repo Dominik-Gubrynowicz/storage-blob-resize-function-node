@@ -17,7 +17,7 @@ const blobServiceClient = new BlobServiceClient(
     defaultAzureCredential
 );
 const containerClient = blobServiceClient.getContainerClient('images1');
-const blockBlobClient = containerClient.getBlockBlobClient('test1');
+const blockBlobClient = containerClient.getBlockBlobClient('test1.txt');
 
 module.exports = async function (context, eventGridEvent, inputBlob){
 
