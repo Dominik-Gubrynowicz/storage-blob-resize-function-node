@@ -3,7 +3,6 @@ const stream = require('stream');
 const {
     BlobServiceClient,
 } = require("@azure/storage-blob");
-const { DefaultAzureCredential } = require("@azure/identity");
 
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME
@@ -11,11 +10,7 @@ const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME
 let blobName = '';
 let containerName = '';
 
-const defaultAzureCredential = new DefaultAzureCredential();
-const blobServiceClient = new BlobServiceClient(
-    `https://${accountName}.blob.core.windows.net`,
-    defaultAzureCredential
-);
+const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString)
 const containerClient = blobServiceClient.getContainerClient('images1');
 const blockBlobClient = containerClient.getBlockBlobClient('test1.txt');
 
@@ -39,7 +34,9 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     containerName = containerPathName.join("/")
 
     context.log(containerName);
-    await blockBlobClient.upload('bbbbb', 5);
+    const data = "Hello world!";
+    const res = await blockBlobClient.upload(data, data.length);
+    context.log(res.requestId);
 
     Jimp.read(inputBlob).then((thumbnail) => {
         
