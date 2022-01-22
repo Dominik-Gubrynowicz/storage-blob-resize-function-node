@@ -50,9 +50,9 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             readStream.end(buffer);
 
             try {
-                const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-                const uploadBlobResponse = await blockBlobClient.upload(readStream, readStream.length);
+                const containerClient = blobServiceClient.getContainerClient('images1');
+                const blockBlobClient = containerClient.getBlockBlobClient('test1');
+                const uploadBlobResponse = await blockBlobClient.upload('aaaaa', 5);
                 context.log(uploadBlobResponse);
             } catch (err) {
                 context.log(err.message);
