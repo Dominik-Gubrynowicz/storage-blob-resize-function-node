@@ -3,6 +3,7 @@ const stream = require('stream');
 const {
     BlobServiceClient,
 } = require("@azure/storage-blob");
+const { read } = require('jimp');
 
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 
@@ -37,7 +38,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
     context.log(containerName);
 
-    containerClient = blobServiceClient.getContainerClient(containerName);
+    containerClient = blobServiceClient.getContainerClient('images1');
     blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     Jimp.read(inputBlob).then((thumbnail) => {
@@ -53,7 +54,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
 
             try {
                 // const uploadBlobResponse = await blockBlobClient.upload(readStream, readStream.length);
-                await blockBlobClient.uploadStream(stream,
+                await blockBlobClient.uploadStream(readStream,
                     uploadOptions.bufferSize, uploadOptions.maxBuffers,
                     { blobHTTPHeaders: { blobContentType: "image/png" } });
 
