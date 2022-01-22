@@ -16,6 +16,8 @@ const blobServiceClient = new BlobServiceClient(
     `https://${accountName}.blob.core.windows.net`,
     defaultAzureCredential
 );
+const containerClient = blobServiceClient.getContainerClient('images1');
+const blockBlobClient = containerClient.getBlockBlobClient('test1');
 
 module.exports = async function (context, eventGridEvent, inputBlob){
 
@@ -37,6 +39,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     containerName = containerPathName.join("/")
 
     context.log(containerName);
+    await blockBlobClient.upload('bbbbb', 5);
 
     Jimp.read(inputBlob).then((thumbnail) => {
         
@@ -50,10 +53,8 @@ module.exports = async function (context, eventGridEvent, inputBlob){
             readStream.end(buffer);
 
             try {
-                const containerClient = blobServiceClient.getContainerClient('images1');
-                const blockBlobClient = containerClient.getBlockBlobClient('test1');
                 const uploadBlobResponse = await blockBlobClient.upload('aaaaa', 5);
-                context.log(uploadBlobResponse);
+                context.log(uploadBlobResponse.requestId);
             } catch (err) {
                 context.log(err.message);
                 throw new Error(err)
