@@ -5,7 +5,7 @@ const {
 } = require("@azure/storage-blob");
 
 const ONE_MEGABYTE = 1024 * 1024;
-const uploadOptions = { bufferSize: 5 * ONE_MEGABYTE, maxBuffers: 10000 };
+const uploadOptions = { bufferSize: 1000 * ONE_MEGABYTE, maxBuffers: 10000 };
 
 let containerName = 'thumbnails';
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
