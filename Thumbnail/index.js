@@ -15,6 +15,8 @@ const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 
 module.exports = async function (context, eventGridEvent, inputBlob){
 
+    context.log(typeof inputBlob);
+
     const subject = eventGridEvent.subject;
     const fileName = path.basename(subject);
     context.log('File name: ', fileName);
