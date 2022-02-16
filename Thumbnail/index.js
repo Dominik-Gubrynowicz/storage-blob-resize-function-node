@@ -43,7 +43,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const readStream = stream.PassThrough();
     readStream.end(await image.toBuffer());
 
-    const blobClient = new BlockBlobClient(connectionString, containerName, blobName, pipelineOptions);
+    const blobClient = new BlockBlobClient(connectionString, containerPathName, newFileName);
 
     try {
         await blobClient.uploadStream(readStream,
