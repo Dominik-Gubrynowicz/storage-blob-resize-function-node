@@ -9,7 +9,7 @@ const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 const path = require('path');
 const sharp = require('sharp');
 
-const THUMB_MAX_WIDTH = 200;
+const THUMB_WIDTH = 1200;
 
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 
@@ -40,7 +40,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const containerPathName = containerPathArray.join('/');
 
     const image = await sharp(inputBlob);
-    image.resize({ width: THUMB_MAX_WIDTH }).png({compressionLevel: 8});
+    image.resize({ width: THUMB_WIDTH }).png({compressionLevel: 8});
 
     const readStream = stream.PassThrough();
     readStream.end(await image.toBuffer());
