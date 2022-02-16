@@ -1,4 +1,3 @@
-const Jimp = require('jimp');
 const stream = require('stream');
 const {
     BlockBlobClient
@@ -7,53 +6,52 @@ const {
 const ONE_MEGABYTE = 1024 * 1024;
 const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
-let containerName = 'thumbnails';
+const path = require('path');
+const sharp = require('sharp');
+
+const THUMB_MAX_WIDTH = 200;
+
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-let blobName = 'default-low.png';
 
 module.exports = async function (context, eventGridEvent, inputBlob){
-    const widthInPixels = 1200;
 
-    const sub = eventGridEvent.subject;
-    context.log(sub);
-    const splitted = sub.split('/');
-    const outBlobName = splitted[splitted.length - 1];
-    context.log('In file: ', outBlobName);
+    const subject = eventGridEvent.subject;
+    const fileName = path.basename(subject);
+    context.log('File name: ', fileName);
 
-    const final = outBlobName.replace('.png', '-low.png');
-    blobName = final;
-    context.log('Out file: ', final);
-
-    let containerPathName = splitted;
-    containerPathName.pop();
-    containerPathName.splice(0, 4);
-    containerPathName.splice(1,1);
-
-    containerName = containerPathName.join("/")
-
-    context.log(containerName);
-
-    Jimp.read(inputBlob).then((thumbnail) => {
-        
-        thumbnail.resize(widthInPixels, Jimp.AUTO);
-
-        thumbnail.getBuffer(Jimp.MIME_PNG, async (err, buffer) => {
-
-            const readStream = stream.PassThrough();
-            readStream.end(buffer);
-            
-            context.log('aaaa');
-            context.log(final);
-            const blobClient = new BlockBlobClient(connectionString, containerName, blobName);
-            
-            try {
-                await blobClient.uploadStream(readStream,
-                    uploadOptions.bufferSize,
-                    uploadOptions.maxBuffers,
-                    { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
-            } catch (err) {
-                context.log(err.message);
-            }
+    if(path.extname(subject) != ".png" || fileName.endsWith('-low.png')) {
+        context.log.warn('This file should not be processed. Skipping...');
+        context.res({
+            body: "Wrong extension or file has been processed before",
+            status: 417
         });
-    });
-};
+        return "Wrong extension or file has been processed before";
+    } 
+
+    const newFileName = path.basename(subject, path.extname(subject)) + '-low' + path.extname(subject);
+    context.log('New file name: ', newFileName);
+
+    let containerPathArray = path.dirname(subject).split('/');
+    containerPathArray.splice(0,4);
+    containerPathArray.splice(1,1);
+  
+    const containerPathName = containerPathArray.join('/');
+
+    const image = await sharp(inputBlob);
+    image.resize({ width: THUMB_MAX_WIDTH }).png({compressionLevel: 8});
+
+    const readStream = stream.PassThrough();
+    readStream.end(await image.toBuffer());
+
+    const blobClient = new BlockBlobClient(connectionString, containerName, blobName, pipelineOptions);
+
+    try {
+        await blobClient.uploadStream(readStream,
+            uploadOptions.bufferSize,
+            uploadOptions.maxBuffers,
+            { blobHTTPHeaders: { blobContentType: "image/png" } }).then((res) => context.log(res));
+    } catch (err) {
+        context.log.error(err.message);
+        throw new Error(err)
+    }
+}
