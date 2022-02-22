@@ -40,7 +40,7 @@ module.exports = async function (context, eventGridEvent, inputBlob){
     const containerPathName = containerPathArray.join('/');
 
     const image = await sharp(inputBlob);
-    image.resize({ width: THUMB_WIDTH }).png({quality: 90, compressionLevel: 8});
+    image.resize({ width: THUMB_WIDTH }).png({quality: 90, compressionLevel: 9});
 
     const readStream = stream.PassThrough();
     readStream.end(await image.toBuffer());
